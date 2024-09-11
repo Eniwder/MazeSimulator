@@ -1,6 +1,7 @@
 # 仕様
 穴掘り法と区域分割法を試せる。
-https://eniwder.github.io/MazeSimulator /
+
+https://eniwder.github.io/MazeSimulator
 
 
 ## 参考
