@@ -373,7 +373,8 @@ function DivideStart(width, height, ctx, scale) {
 
 function generate() {
   const base = canvasRef.value.parentNode.parentNode;
-  scale = Math.floor(Math.min((base.clientWidth / h_Width.value), (base.clientHeight / h_Height.value)));
+  currentMap = null;
+  onResize();
   if (h_Algorithm.value === algorithms[0]) {
     currentMap = DigStart(h_Width.value, h_Height.value, ctx, scale);
   } else {
