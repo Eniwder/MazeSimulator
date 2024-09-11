@@ -15,6 +15,10 @@
             <v-number-input label="マップの高さ" :min="1" :max="128" v-model="h_Height" variant="outlined"
               control-variant="stacked" @update:model-value="generate"></v-number-input>
           </v-col>
+          <v-col cols="4" sm="2" v-if="h_Algorithm === algorithms[0]">
+            <v-number-input label="壁の破壊率" :min="0" :max="100" v-model="_h_breakWallRate" variant="outlined"
+              control-variant="stacked" @update:model-value="generate"></v-number-input>
+          </v-col>
           <v-col cols="4" sm="2" v-if="h_Algorithm === algorithms[1]">
             <v-number-input label="部屋の幅の最小値" :min="1" v-model="_h_minWidth" variant="outlined" control-variant="stacked"
               @update:model-value="generate"></v-number-input>
@@ -63,6 +67,7 @@ const h_Algorithm = ref('区域分割法');
 const h_Width = ref(33);
 const h_Height = ref(33);
 const _divideMargin = ref(8);
+const _h_breakWallRate = ref(0);
 let scale = 5;
 
 const canvasRef = ref();
@@ -145,7 +150,7 @@ class MyMap {
     for (let i = 0; i < this._height; ++i) {
       for (let j = 0; j < this._width; ++j) {
         if (this._ground[i][j] === this.Wall) {
-          ctx.fillStyle = "#ddd";
+          ctx.fillStyle = "#00C853";
         } else {
           ctx.fillStyle = "black";
         }
@@ -242,8 +247,39 @@ function DigStart(width, height, ctx, scale) {
   if (startX % 2 === 0) startX++;
 
   Dig(myMap, startX, startY);
+  randomDig(myMap, width, height);
   myMap.Show(ctx, scale);
   return myMap;
+}
+
+function randomDig(myMap, width, height) {
+  const walls = [...Array(height).keys()].flatMap(y =>
+    [...Array(width).keys()].filter(x => myMap.Get(x, y) === myMap.Wall).map(x => [x, y])
+  );
+  const breakNum = parseInt(walls.length * (_h_breakWallRate.value / 100.0));
+  let rest = [];
+  walls.sort(() => 0.5 - Math.random()).slice(0, breakNum).forEach(([x, y]) => {
+    if (myMap.Get(x - 1, y) === myMap.Route || myMap.Get(x + 1, y) === myMap.Route ||
+      myMap.Get(x, y - 1) === myMap.Route || myMap.Get(x, y + 1) === myMap.Route) {
+      myMap.Set(x, y, myMap.Route);
+    } else {
+      rest.push([x, y]);
+    }
+  });
+  let restLen = rest.length;
+  while (true) {
+    // よくないけどめんどい
+    rest = rest.filter(([x, y]) => {
+      if (myMap.Get(x - 1, y) === myMap.Route || myMap.Get(x + 1, y) === myMap.Route ||
+        myMap.Get(x, y - 1) === myMap.Route || myMap.Get(x, y + 1) === myMap.Route) {
+        myMap.Set(x, y, myMap.Route);
+        return false;
+      }
+      return true;
+    });
+    if (rest.length === restLen) break;
+    restLen = rest.length;
+  }
 }
 
 // 分割法開始
@@ -340,8 +376,8 @@ function generate() {
 function onResize() {
   const base = canvasRef.value.parentNode.parentNode;
   scale = Math.floor(Math.min((base.clientWidth / h_Width.value), (base.clientHeight / h_Height.value)));
-  canvasRef.value.setAttribute("width", scale * h_Width.value);
-  canvasRef.value.setAttribute("height", scale * h_Height.value);
+  canvasRef.value.setAttribute("width", scale * (h_Width.value + 1));
+  canvasRef.value.setAttribute("height", scale * (h_Height.value + 1));
 
   if (currentMap && ctx) currentMap.Show(ctx, scale);
 }
