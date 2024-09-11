@@ -258,7 +258,7 @@ function randomDig(myMap, width, height) {
   );
   const breakNum = parseInt(walls.length * (_h_breakWallRate.value / 100.0));
   let rest = [];
-  walls.sort(() => 0.5 - Math.random()).slice(0, breakNum).forEach(([x, y]) => {
+  shuffle(walls).slice(0, breakNum).forEach(([x, y]) => {
     if (myMap.Get(x - 1, y) === myMap.Route || myMap.Get(x + 1, y) === myMap.Route ||
       myMap.Get(x, y - 1) === myMap.Route || myMap.Get(x, y + 1) === myMap.Route) {
       myMap.Set(x, y, myMap.Route);
@@ -279,6 +279,14 @@ function randomDig(myMap, width, height) {
     });
     if (rest.length === restLen) break;
     restLen = rest.length;
+  }
+  function shuffle(array) {
+    let n = array.length;
+    for (let i = n - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];  // 要素の入れ替え
+    }
+    return array;
   }
 }
 
