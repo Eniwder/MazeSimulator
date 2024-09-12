@@ -40,7 +40,7 @@
             <v-btn @click="generate" width="120" height="56" color="green-accent-4">再生成</v-btn>
           </v-col>
           <v-btn icon href="https://github.com/Eniwder/MazeSimulator" target="_blank" density="compact" variant="text"
-            location="top right" position="absolute" class="githubicon">
+            location="bottom right" position="absolute" class="githubicon">
             <v-icon>mdi-github</v-icon>
           </v-btn>
         </v-row>
