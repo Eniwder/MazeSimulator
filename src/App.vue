@@ -384,7 +384,7 @@ function generate() {
 
 function onResize() {
   const base = canvasRef.value.parentNode.parentNode;
-  scale = Math.floor(Math.min((base.clientWidth / h_Width.value), (base.clientHeight / h_Height.value)));
+  scale = Math.max(2, Math.floor(Math.min((base.clientWidth / h_Width.value), (base.clientHeight / h_Height.value))));
   canvasRef.value.setAttribute("width", scale * (h_Width.value + 1));
   canvasRef.value.setAttribute("height", scale * (h_Height.value + 1));
 
@@ -409,7 +409,7 @@ function debounce(func, timeout) {
 }
 
 .canvasRow {
-  height: 64vh;
+  height: min(64vh, 80vw);
   width: 80vw;
 }
 
