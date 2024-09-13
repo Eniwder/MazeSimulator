@@ -19,6 +19,9 @@
             <v-number-input label="壁の破壊率" :min="0" :max="100" v-model="_h_breakWallRate" variant="outlined"
               control-variant="stacked" @update:model-value="generate"></v-number-input>
           </v-col>
+          <v-col cols="4" sm="2" v-if="h_Algorithm === algorithms[0]">
+            <v-switch label="外壁無視" v-model="_h_breakAround" inset @update:model-value="generate"></v-switch>
+          </v-col>
           <v-col cols="4" sm="2" v-if="h_Algorithm === algorithms[1]">
             <v-number-input label="部屋の幅の最小値" :min="1" v-model="_h_minWidth" variant="outlined" control-variant="stacked"
               @update:model-value="generate"></v-number-input>
@@ -68,6 +71,7 @@ const h_Width = ref(33);
 const h_Height = ref(33);
 const _divideMargin = ref(8);
 const _h_breakWallRate = ref(0);
+const _h_breakAround = ref(false);
 let scale = 5;
 
 const canvasRef = ref();
@@ -243,8 +247,10 @@ function DigStart(width, height, ctx, scale) {
   const myMap = new MyMap(width, height);
   let startX = GetRandomInt(0, width - 2);
   let startY = GetRandomInt(0, height - 2);
-  if (startY % 2 === 0) startY++;
-  if (startX % 2 === 0) startX++;
+  if (!_h_breakAround.value) {
+    if (startY % 2 === 0) startY++;
+    if (startX % 2 === 0) startX++;
+  }
 
   Dig(myMap, startX, startY);
   randomDig(myMap, width, height);
